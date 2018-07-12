@@ -3,14 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@material-ui/core": "^1.2.1",
-    "@material-ui/icons": "^1.1.0",
     "axios": "^0.18.0",
     "express": "^4.16.3",
     "mongoose": "^5.1.6",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
+    "react-materialize": "^2.3.3",
     "react-router": "^4.3.1",
+    "react-router-dom": "^4.3.1",
     "react-scripts": "1.1.4"
   },
   "proxy": "http://localhost:5000/",
@@ -20,7 +20,8 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "server": "nodemon lib/server.js --ignore src/",
-    "start": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\""
+    "start": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
+    "seeds": "node lib/seeds/index.js"
   },
   "devDependencies": {
     "concurrently": "^3.5.1",

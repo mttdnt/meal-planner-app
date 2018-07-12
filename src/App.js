@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import './App.css';
 import axios from "axios";
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
-import AccountCircle from '@material-ui/icons/AccountCircle';
-import DashboardIcon from '@material-ui/icons/Dashboard';
+import { Navbar, Icon, NavItem } from 'react-materialize'; 
+import { BrowserRouter, Route, Link, Switch } from 'react-router-dom'
+import UserPage from './components/UserPage';
+import MealView from './components/MealView';
 
 class App extends Component {
 
@@ -34,17 +33,22 @@ class App extends Component {
 
   render() {
     return (
-      <AppBar position="static" color="default">
-        <Toolbar>
-          Meal Prep
-          <IconButton color="inherit" aria-label="Menu">
-            <DashboardIcon />
-          </IconButton>
-          <IconButton color="inherit" aria-label="Menu">
-            <AccountCircle />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
+        <BrowserRouter>
+          <div>
+            <Navbar brand='Meal Planner' right>
+              <div style={{"display": "-webkit-box"}}>
+                <Link to="/user"><Icon>account_circle</Icon></Link>
+                <Link to="/"><Icon>fastfood</Icon></Link>
+              </div>
+            </Navbar>
+
+            <Switch>
+              <Route exact path='/user' component={UserPage} />
+              <Route exact path='/' component={MealView} />  
+            </Switch>
+          </div>
+
+        </BrowserRouter>
     );
   }
 }
