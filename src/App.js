@@ -2,53 +2,87 @@ import React, { Component } from 'react';
 import './App.css';
 import axios from "axios";
 import { Navbar, Icon, NavItem } from 'react-materialize'; 
-import { BrowserRouter, Route, Link, Switch } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom';
+
 import UserPage from './components/UserPage';
 import MealView from './components/MealView';
+import Login from './components/Login';
+import Logout from './components/Logout';
+import Signup from './components/Signup';
+
+import { setToken, getToken, removeToken } from "./services/tokenService";
 
 class App extends Component {
 
-  componentWillMount(){
-    this.healthCheck();
-    this.login();
+  constructor(props){
+    super(props);
+
+    this.state = {
+      user: null
+    } 
   }
 
-  healthCheck = async () => {
-    try{
-      const response = await axios.get('/healthcheck');
-      console.log(response.data);
-    }catch(error){
-      console.log(error);
-    }
+  componentDidMount() {
+    this.getCurrentUser();
   }
 
-  login = async () => {
-    try{
-      const response = await axios.post('/login');
-      console.log(response.data);
-    }catch(error){
-      console.log(error);
-    }
+  login = (token) => {
+    setToken(token);
+    this.getCurrentUser();
+  }
+
+  logout = (token) => {
+    removeToken();
+    this.setState({user: null});
+  }
+
+  getCurrentUser = () =>{
+    this.setState({user: getToken()})
   }
 
   render() {
     return (
-        <BrowserRouter>
-          <div>
-            <Navbar brand='Meal Planner' right>
-              <div style={{"display": "-webkit-box"}}>
-                <Link to="/user"><Icon>account_circle</Icon></Link>
-                <Link to="/"><Icon>fastfood</Icon></Link>
-              </div>
-            </Navbar>
+      <Router>
+        <div> 
+          <Navbar brand='Meal Planner' right>
+          {
+            this.state.user?
+            <div style={{"display": "-webkit-box"}}>
+              <Link to="/"><Icon>account_circle</Icon></Link>
+              <Link to="/meals"><Icon>fastfood</Icon></Link>
+              <Logout logout={this.logout}/>
+            </div>
+            :
+            null
+          }
+          </Navbar>
 
-            <Switch>
-              <Route exact path='/user' component={UserPage} />
-              <Route exact path='/' component={MealView} />  
-            </Switch>
-          </div>
-
-        </BrowserRouter>
+          <Route exact path='/' render={ ()=>
+            this.state.user?
+            <UserPage user={this.state.user}/>
+            :
+            <Redirect to="/login"/>
+          }/>
+          <Route exact path="/login" render={ ()=>
+            this.state.user?
+            <Redirect to="/"/>
+            :
+            <Login login={this.login}/>
+          }/>
+          <Route exact path='/meals' render={ ()=>
+            this.state.user?
+            <MealView user={this.state.user}/>
+            :
+            <Redirect to="/login"/>
+          } />  
+          <Route exact path="/signup" render={ ()=>
+            this.state.user?
+            <Redirect to="/"/>
+            :
+            <Signup />
+          }/>          
+        </div>
+      </Router>
     );
   }
 }

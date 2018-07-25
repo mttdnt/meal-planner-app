@@ -4,6 +4,11 @@ import axios from "axios";
 
 class MealView extends Component {
 
+  async componentDidMount(){
+    const res = await axios.get('/users');
+    console.log(res.data);
+  }
+
   render() {
     return (
       <div>
