@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import '../App.css';
 import axios from "axios";
-import { Row, Col, Preloader, Card, Table, Button } from 'react-materialize';
+import { Row, Col, Preloader, Card, Table, Button, Modal } from 'react-materialize';
 
 class UserPage extends Component {
 
@@ -12,7 +12,8 @@ class UserPage extends Component {
             meals: null,
             currentFood: null,
             currentAmount: null,
-            currentUnit: null
+            currentUnit: null,
+            currentMeal: null
         }
     }
 
@@ -25,8 +26,6 @@ class UserPage extends Component {
     }
 
     getMealsByUser = async (user_id) => { 
-        console.log(this.props.user)
-        
         try{
             const res = await axios.get('/meals/user', {
                 headers: {
@@ -76,6 +75,14 @@ class UserPage extends Component {
         }
     }
 
+    toggleAddFoodItem = (e) => {
+        this.setState({currentMeal: e.target.name});
+    }
+
+    cancelAddFoodItem = (e) => {
+        this.setState({currentAmount: null, currentFood: null, currentUnit: null, currentMeal: null});
+    }
+
     addFoodItem = async (e) => {
 
         if(this.state.currentAmount===null || this.state.currentUnit===null || this.state.currentFood===null  ){
@@ -98,7 +105,7 @@ class UserPage extends Component {
                 const updatedMeals = this.state.meals;
                 updatedMeals[index].foodList.push(response.data);
         
-                this.setState({meals: updatedMeals, currentAmount: null, currentFood: null, currentUnit: null});
+                this.setState({meals: updatedMeals, currentAmount: null, currentFood: null, currentUnit: null, currentMeal: null});
             }catch(e){
                 console.error(e);
             }
@@ -161,12 +168,24 @@ class UserPage extends Component {
                         <Button name={index} onClick={this.deleteMeal} style={{"position": "absolute", "top": "0", "left": "0"}}waves='light'>Delete</Button>
                         <h3>Meal {index+1}</h3>
                         {this.renderFoodItems(meal.foodList.slice())}
+                        { 
+                        this.state.currentMeal===null?
+                        <Button name={index} onClick={this.toggleAddFoodItem} style={{"marginTop": "1rem"}} waves='light'>Add</Button> 
+                        :
+                        null
+                        }
+                        {
+                        Number(this.state.currentMeal)===index && this.state.currentMeal!==null?
                         <tr>
                             <td><input type="text" name="currentFood" onChange={this.mealFormChange} placeholder="Name" value={this.state.currentFood}/></td>
                             <td><input type="text" name="currentAmount" onChange={this.mealFormChange} placeholder="Amount" value={this.state.currentAmount}/></td>
                             <td><input type="text" name="currentUnit" onChange={this.mealFormChange} placeholder="Unit" value={this.state.currentUnit}/></td>
                             <td><Button name={index} onClick={this.addFoodItem} style={{"marginTop": "1rem"}} waves='light'>Add</Button></td>
+                            <td><Button onClick={this.cancelAddFoodItem} style={{"marginTop": "1rem"}} waves='light'>Cancel</Button></td>
                         </tr>
+                        :
+                        null
+                        }
                     </Card>
                 </Col>    
             );
@@ -174,6 +193,7 @@ class UserPage extends Component {
     }
 
     render() {
+        console.log(this.state.currentMeal)
         if(this.state.loading || this.state.meals===null){
             return(
                 <Row>
